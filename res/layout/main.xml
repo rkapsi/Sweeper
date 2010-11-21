@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo"
+        android:layout_margin="40dip"/>
+        
+    <CheckBox
+        android:id="@+id/external"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:checked="true" 
+        android:text="@string/external"/>
+        
+    <CheckBox
+        android:id="@+id/internal"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:text="@string/internal"/>
+        
+	<Button
+        android:id="@+id/sweep"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="@string/sweep"
+        android:layout_marginTop="30dip"
+        android:layout_gravity="center"/>
+        
+</LinearLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sweeper">Sweeper</string>
+    <string name="external">External Storage</string>
+    <string name="internal">Internal Storage</string>
+    <string name="sweep">Sweep!</string>
+    
+    <string name="deleted">Deleted</string>
+    <string name="sweeping">Sweeping. Please wait...</string>
+    <string name="nothing">No Playlists Deleted</string>
+</resources>

@@ -1,0 +1,9 @@
+Sweeper for Android 2.1+
+
+Sweeper for Android 2.1+ is a simple application that looks for deleted
+Playlists on the phone's internal and external storage and removes their
+references from the Database.
+
+The code was inspired by Rory's PlaylistPurge application.
+
+http://roryok.com/blog/index.php/2010/07/23/clearing-out-deleted-playlists-in-android
