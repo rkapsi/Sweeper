@@ -22,10 +22,8 @@ import static android.provider.MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
@@ -33,75 +31,69 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 
-public class SweepActivity extends ListActivity {
+public class SweepActivity2 extends Activity {
 
     private static final String TAG 
-        = SweepActivity.class.getName();
+        = SweepActivity2.class.getName();
 
     private static final String[] ALL = { "*" };
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.sweep);
         
         Bundle extras = getIntent().getExtras();
         
         boolean external = extras.getBoolean("external");
         boolean internal = extras.getBoolean("internal");
         
-        List<String> messages = new ArrayList<String>();
+        List<Playlist> playlists = new ArrayList<Playlist>();
         
         ProgressDialog dialog = ProgressDialog.show(this, null, 
-                getString(R.string.sweeping), true);
+                getString(R.string.searching), true);
         try {
             if (external) {
-                purge(EXTERNAL_CONTENT_URI, messages);
+                search(EXTERNAL_CONTENT_URI, playlists);
             }
             
             if (internal) {
-                purge(INTERNAL_CONTENT_URI, messages);
+                search(INTERNAL_CONTENT_URI, playlists);
             }
         } finally {
             dialog.dismiss();
         }
         
-        if (messages.isEmpty()) {
-            messages.add(getString(R.string.nothing));
-        }
-        
-        /*ListAdapter adapter = new ArrayAdapter<String>(this, 
-                android.R.layout.simple_list_item_1, messages);*/
+        ListView listView = (ListView)findViewById(R.id.playlists);
         ListAdapter adapter = new ArrayAdapter<String>(this, 
-                android.R.layout.simple_list_item_multiple_choice, messages);
-        setListAdapter(adapter);
+                android.R.layout.simple_list_item_multiple_choice, 
+                new String[] { "A", "B", "C", "D", "E", "F", "G", "H" });
+        listView.setAdapter(adapter);
     }
     
-    private void purge(Uri contentUri, List<String> messages) {
+    private void search(Uri contentUri, List<Playlist> playlists) {
         try {
-            List<String> list = purge(contentUri);
-            messages.addAll(list);
+            List<Playlist> list = search(contentUri);
+            playlists.addAll(list);
         } catch (SQLiteException err) {
             Log.e(TAG, "SQLiteException", err);
         }
     }
     
-    private List<String> purge(Uri contentUri) throws SQLiteException {
-        List<String> list = new ArrayList<String>();
+    private List<Playlist> search(Uri contentUri) throws SQLiteException {
+        List<Playlist> list = new ArrayList<Playlist>();
         Cursor cursor = managedQuery(contentUri, ALL, null, null, null);
         try {
             if (cursor != null && cursor.moveToFirst()) {
-                ContentResolver contentResolver = getContentResolver();
                 do {
-                    int playlistId = cursor.getInt(0);
+                    long playlistId = cursor.getLong(0);
                     String playlistPath = cursor.getString(1);
                     String playlistName = cursor.getString(2);
                     
                     if (StringUtils.isEmpty(playlistPath)) {
-                        list.add(playlistName + " (" + playlistId + ")");
-                        
-                        Uri uri = ContentUris.withAppendedId(contentUri, playlistId);
-                        contentResolver.delete(uri, null, null);
+                        list.add(new Playlist(contentUri, playlistId, playlistName));
                     }
                 } while (cursor.moveToNext());
             }

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="sweeper">Sweeper</string>
+    <string name="info">Sweeper searches for deleted Playlists and removes them.</string>
     <string name="external">External Storage</string>
     <string name="internal">Internal Storage</string>
     <string name="sweep">Sweep!</string>
     
-    <string name="deleted">Deleted</string>
+    <string name="sweep_all">Sweep All</string>
+    <string name="searching">Searching. Please wait...</string>
     <string name="sweeping">Sweeping. Please wait...</string>
     <string name="nothing">No Playlists Deleted</string>
 </resources>
