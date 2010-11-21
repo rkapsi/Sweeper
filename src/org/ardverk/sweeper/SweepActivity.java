@@ -77,8 +77,7 @@ public class SweepActivity extends ListActivity {
     
     private void purge(Uri contentUri, List<String> messages) {
         try {
-            List<String> list 
-                = purge(INTERNAL_CONTENT_URI);
+            List<String> list = purge(contentUri);
             messages.addAll(list);
         } catch (SQLiteException err) {
             Log.e(TAG, "SQLiteException", err);
