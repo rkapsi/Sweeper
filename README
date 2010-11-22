@@ -1,8 +1,7 @@
-Sweeper for Android 2.1+
+Sweeper for Android 1.5+
 
-Sweeper for Android 2.1+ is a simple application that looks for deleted
-Playlists on the phone's internal and external storage and removes their
-references from the Database.
+Sweeper for Android 1.5+ is a simple application that looks for deleted
+Playlists and removes them from the phone's Database.
 
 The code was inspired by Rory's PlaylistPurge application.
 

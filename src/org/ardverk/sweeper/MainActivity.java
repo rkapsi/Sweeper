@@ -46,6 +46,9 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * The main sweep {@link Activity}.
+ */
 public class MainActivity extends Activity {
 
     private static final String TAG 
@@ -66,6 +69,9 @@ public class MainActivity extends Activity {
         task.execute();
     }
     
+    /**
+     * Initializes the {@link MainActivity}.
+     */
     private void initMainActivity(PlaylistEntity[] entities) {
         if (entities == null || entities.length == 0) {
             Intent complete = new Intent(this, CompleteActivity.class);
@@ -86,10 +92,13 @@ public class MainActivity extends Activity {
         });
         
         ListView listView = (ListView)findViewById(R.id.main_playlist_list);
-        ListAdapter adapter = new PlaylistEntityAdapter(this, entities);
+        ListAdapter adapter = new PlaylistAdapter(this, entities);
         listView.setAdapter(adapter);
     }
     
+    /**
+     * Deletes all selected {@link Playlist}s.
+     */
     private void delete() {
         
         DeleteTask task = new DeleteTask() {
@@ -105,10 +114,123 @@ public class MainActivity extends Activity {
         };
         
         ListView listView = (ListView)findViewById(R.id.main_playlist_list);
-        PlaylistEntityAdapter adapter = (PlaylistEntityAdapter)listView.getAdapter();
+        PlaylistAdapter adapter = (PlaylistAdapter)listView.getAdapter();
         task.execute(adapter.getPlaylistEntities());
     }
     
+    /**
+     * The {@link SearchTask} is a background task that searches for 
+     * deleted {@link Playlist}s in the phone's database.
+     */
+    private class SearchTask extends AsyncTask<Void, Void, PlaylistEntity[]> {
+        
+        private ProgressDialog dialog = null;
+        
+        @Override
+        protected void onPreExecute() {
+            dialog = ProgressDialog.show(MainActivity.this, null, 
+                    getString(R.string.searching), true);
+        }
+        
+        @Override
+        protected PlaylistEntity[] doInBackground(Void... params) {
+            
+            List<PlaylistEntity> entities = new ArrayList<PlaylistEntity>();
+            
+            List<PlaylistEntity> external = listDeleted(EXTERNAL_CONTENT_URI);
+            List<PlaylistEntity> internal = listDeleted(INTERNAL_CONTENT_URI);
+            
+            if (external != null) {
+                entities.addAll(external);
+            }
+            
+            if (internal != null) {
+                entities.addAll(internal);
+            }
+            
+            /*entities = new ArrayList<PlaylistEntity>();
+            entities.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 0, null, "A")));
+            entities.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 1, null, "B")));
+            entities.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 2, null, "C")));
+            entities.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 3, null, "D")));
+            entities.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 4, null, "E")));
+            entities.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 5, null, "F")));
+            entities.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 6, null, "G")));
+            entities.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 7, null, "H")));*/
+            
+            return entities.toArray(new PlaylistEntity[0]);
+        }
+
+        private List<PlaylistEntity> listDeleted(Uri contentUri) {
+            try {
+                List<Playlist> playlists 
+                    = Playlist.listDeleted(MainActivity.this, contentUri);
+                if (playlists != null && !playlists.isEmpty()) {
+                    return PlaylistEntity.transform(playlists);
+                }
+            } catch (SQLiteException err) {
+                Log.d(TAG, "SQLiteException", err);
+            }
+            return null;
+        }
+        
+        @Override
+        protected void onPostExecute(PlaylistEntity[] entities) {
+            dialog.dismiss();
+        }
+    }
+    
+    /**
+     * The {@link DeleteTask} is a background task that deletes
+     * {@link Playlist}s from the phone's database.
+     */
+    private class DeleteTask extends AsyncTask<PlaylistEntity, Void, Void> {
+        
+        private ProgressDialog dialog = null;
+        
+        @Override
+        protected void onPreExecute() {
+            dialog = ProgressDialog.show(MainActivity.this, null, 
+                    getString(R.string.sweeping), true);
+        }
+        
+        @Override
+        protected Void doInBackground(PlaylistEntity... entities) {
+            deleteAll(entities);
+            return null;
+        }
+        
+        private boolean deleteAll(PlaylistEntity... entities) {
+            try {
+                ContentResolver contentResolver = getContentResolver();
+                for (PlaylistEntity entity : entities) {
+                    if (!entity.isChecked()) {
+                        continue;
+                    }
+                    
+                    Playlist playlist = entity.getPlaylist();
+                    Uri uri = playlist.getContentUri();
+                    contentResolver.delete(uri, null, null);
+                }
+                return true;
+            } catch (SQLiteException err) {
+                Log.d(TAG, "SQLiteException", err);
+            } catch (UnsupportedOperationException err) {
+                Log.d(TAG, "UnsupportedOperationException", err);
+            }
+            return false;
+        }
+    
+        @Override
+        protected void onPostExecute(Void result) {
+            dialog.dismiss();
+        }
+    }
+    
+    /**
+     * The {@link PlaylistEntity} is a wrapper for {@link Playlist} 
+     * that adds some additional state information.
+     */
     private static class PlaylistEntity implements Checkable, 
             CheckBox.OnCheckedChangeListener {
         
@@ -167,7 +289,11 @@ public class MainActivity extends Activity {
         }
     }
     
-    private static class PlaylistEntityAdapter extends BaseAdapter {
+    /**
+     * The {@link PlaylistAdapter} is a {@link ListAdapter} 
+     * for {@link PlaylistEntity}ies.
+     */
+    private static class PlaylistAdapter extends BaseAdapter {
         
         private final View.OnClickListener listener 
                 = new View.OnClickListener() {
@@ -182,7 +308,7 @@ public class MainActivity extends Activity {
         
         private final PlaylistEntity[] entities;
         
-        public PlaylistEntityAdapter(Context context, 
+        public PlaylistAdapter(Context context, 
                 PlaylistEntity[] entities) {
             this.context = context;
             this.entities = entities;
@@ -241,105 +367,6 @@ public class MainActivity extends Activity {
             builder.append(", ").append(entity.getId());
             
             return builder.toString();
-        }
-    }
-    
-    private class SearchTask extends AsyncTask<Void, Void, PlaylistEntity[]> {
-        
-        private ProgressDialog dialog = null;
-        
-        @Override
-        protected void onPreExecute() {
-            dialog = ProgressDialog.show(MainActivity.this, null, 
-                    getString(R.string.searching), true);
-        }
-        
-        @Override
-        protected PlaylistEntity[] doInBackground(Void... params) {
-            
-            List<PlaylistEntity> entities = new ArrayList<PlaylistEntity>();
-            
-            List<PlaylistEntity> external = listDeleted(EXTERNAL_CONTENT_URI);
-            List<PlaylistEntity> internal = listDeleted(INTERNAL_CONTENT_URI);
-            
-            if (external != null) {
-                entities.addAll(external);
-            }
-            
-            if (internal != null) {
-                entities.addAll(internal);
-            }
-            
-            /*external = new ArrayList<PlaylistEntity>();
-            external.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 0, null, "A")));
-            external.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 1, null, "B")));
-            external.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 2, null, "C")));
-            external.add(new PlaylistEntity(new Playlist(EXTERNAL_CONTENT_URI, 3, null, "D")));
-            external.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 4, null, "E")));
-            external.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 5, null, "F")));
-            external.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 6, null, "G")));
-            external.add(new PlaylistEntity(new Playlist(INTERNAL_CONTENT_URI, 7, null, "H")));*/
-            
-            return entities.toArray(new PlaylistEntity[0]);
-        }
-
-        private List<PlaylistEntity> listDeleted(Uri contentUri) {
-            try {
-                List<Playlist> playlists 
-                    = Playlist.listDeleted(MainActivity.this, contentUri);
-                if (playlists != null && !playlists.isEmpty()) {
-                    return PlaylistEntity.transform(playlists);
-                }
-            } catch (SQLiteException err) {
-                Log.d(TAG, "SQLiteException", err);
-            }
-            return null;
-        }
-        
-        @Override
-        protected void onPostExecute(PlaylistEntity[] entities) {
-            dialog.dismiss();
-        }
-    }
-    
-    private class DeleteTask extends AsyncTask<PlaylistEntity, Void, Void> {
-        
-        private ProgressDialog dialog = null;
-        
-        @Override
-        protected void onPreExecute() {
-            dialog = ProgressDialog.show(MainActivity.this, null, 
-                    getString(R.string.sweeping), true);
-        }
-        
-        @Override
-        protected Void doInBackground(PlaylistEntity... entities) {
-            deleteAll(entities);
-            return null;
-        }
-        
-        private boolean deleteAll(PlaylistEntity... entities) {
-            try {
-                ContentResolver contentResolver = getContentResolver();
-                for (PlaylistEntity entity : entities) {
-                    if (!entity.isChecked()) {
-                        continue;
-                    }
-                    
-                    Playlist playlist = entity.getPlaylist();
-                    Uri uri = playlist.getContentUri();
-                    contentResolver.delete(uri, null, null);
-                }
-                return true;
-            } catch (SQLiteException err) {
-                Log.d(TAG, "SQLiteException", err);
-            }
-            return false;
-        }
-    
-        @Override
-        protected void onPostExecute(Void result) {
-            dialog.dismiss();
         }
     }
 }

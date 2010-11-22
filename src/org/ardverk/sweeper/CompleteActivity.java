@@ -24,10 +24,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * The {@link CompleteActivity} is shown upon completion of the sweep task.
+ */
 public class CompleteActivity extends Activity {
     
+    /**
+     * The reason why the sweep task completed.
+     */
     public static enum Reason {
-        COMPLETE(R.string.complete_default_message),
+        DEFAULT(R.string.complete_default_message),
         NOTHING_FOUND(R.string.complete_nothing_message);
         
         private final int resourceId;
@@ -47,7 +53,7 @@ public class CompleteActivity extends Activity {
         
         static Reason valueOf(Intent intent) {
             String name = intent.getStringExtra(Reason.class.getName());
-            return valueOf(name != null ? name : COMPLETE.name());
+            return valueOf(name != null ? name : DEFAULT.name());
         }
     }
     
