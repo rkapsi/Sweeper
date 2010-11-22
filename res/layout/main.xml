@@ -1,43 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content"
-        android:src="@drawable/logo"
-        android:layout_margin="40dip"/>
-    
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/info"
-        android:layout_marginBottom="25dip"
-        android:textSize="20px"/>
-        
-    <CheckBox
-        android:id="@+id/external"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content"
-        android:checked="true" 
-        android:text="@string/external"/>
-        
-    <CheckBox
-        android:id="@+id/internal"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:text="@string/internal"/>
-        
-	<Button
-        android:id="@+id/sweep"
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content" 
-        android:text="@string/sweep"
-        android:layout_marginTop="30dip"
-        android:layout_gravity="center"/>
-        
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+	
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:id="@+id/main_delete_layout"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:background="@drawable/gray_gradient"
+			android:layout_alignParentBottom="true">
+		
+		<Button android:id="@+id/main_delete_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/delete"
+	        android:layout_marginTop="4dip"
+	        android:layout_marginBottom="4dip"/>
+	</LinearLayout>
+	
+   	<ListView android:id="@+id/main_playlist_list"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_alignParentTop="true"
+		android:layout_above="@id/main_delete_layout"/>
+</RelativeLayout>

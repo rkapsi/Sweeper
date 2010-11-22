@@ -16,7 +16,7 @@
 
 package org.ardverk.sweeper;
 
-public class StringUtils {
+class StringUtils {
 
     private StringUtils() {}
     

@@ -5,22 +5,15 @@
       android:versionName="1.0">
     <application android:icon="@drawable/icon" android:label="@string/sweeper">
         <activity android:name=".MainActivity"
-                  android:label="@string/sweeper"
-                  android:theme="@android:style/Theme.NoTitleBar">
+                  android:label="@string/sweeper">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-		<activity android:name=".SweepActivity"
-                  android:theme="@android:style/Theme.NoTitleBar">
-            <intent-filter>
-            </intent-filter>
-        </activity>
         
-        <activity android:name=".SweepActivity2"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".CompleteActivity"
+                  android:label="@string/sweeper">
             <intent-filter>
             </intent-filter>
         </activity>

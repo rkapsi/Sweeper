@@ -18,7 +18,7 @@ package org.ardverk.sweeper;
 
 import android.database.Cursor;
 
-public class CursorUtils {
+class CursorUtils {
 
     private CursorUtils() {}
     
